@@ -91,7 +91,7 @@ contract gamePredictor is AutomationCompatibleInterface {
     //     uint256 totalPayout
     // );
 
-    constructor(uint256 entranceFee) {
+    constructor(uint256 entranceFee, uint256 updateInterval) {
         i_entryFee = entranceFee;
 
         // had faced issues while fetchings api from chainlink functions which is in closed beta.
@@ -128,7 +128,7 @@ contract gamePredictor is AutomationCompatibleInterface {
             matchStatus.Yet_to_Start
         );
 
-        // interval = updateInterval;
+        interval = updateInterval;
         lastTimeStamp = block.timestamp;
     }
 
