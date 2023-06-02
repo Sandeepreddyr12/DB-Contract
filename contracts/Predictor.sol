@@ -9,7 +9,7 @@ pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol";
 
-// Errors
+/* Errors */
 error Predictor__notEnoughFeeEntered(uint256 entryFee);
 error Predictor__notAnOwner();
 error Raffle__UpkeepNotNeeded();
@@ -17,14 +17,20 @@ error Predictor__inValidContest();
 error Predictor__notEnoughBalance();
 
 contract gamePredictor is AutomationCompatibleInterface {
-    /* state Variables */
-
+    /* Type declarations */
     enum result {
         won_by_teamA,
         won_by_teamB,
         Draw_or_noResult
     }
 
+    enum matchStatus {
+        Yet_to_Start,
+        in_Progress,
+        Finished
+    }
+
+    /* state Variables */
     struct ContestDetails {
         mapping(address => PlayerStake) playerStakes;
         uint256 totalAmount_A;
@@ -37,30 +43,18 @@ contract gamePredictor is AutomationCompatibleInterface {
         uint256 teamB;
     }
 
-    enum matchStatus {
-        Yet_to_Start,
-        in_Progress,
-        Finished
-    }
-
     struct Game {
         uint256 matchId;
         string teamA;
         string teamB;
-        bool isValidContest;
         matchStatus status;
-        // string result;
     }
 
     mapping(uint256 => ContestDetails) private contestEntrances;
-    // mapping(uint256 => Game) contests;
     Game[] private ContestsId;
-    uint256 private immutable i_entryFee;
     mapping(address => uint256) private Winnings;
-
-    // address payable[] private s_Players;
-    uint256 public totalEntries;
-    address public owner;
+    uint256 private immutable i_entryFee;
+    address private owner;
 
     // chainlink automation varaiables
 
@@ -97,7 +91,7 @@ contract gamePredictor is AutomationCompatibleInterface {
         // had faced issues while fetchings api from chainlink functions which is in closed beta.
         // untill, hardcoded the contests and events.
         ContestsId.push(
-            Game(11223, "india", "australia", true, matchStatus.Yet_to_Start)
+            Game(11223, "india", "australia", matchStatus.Yet_to_Start)
         );
         emit Ongoing_Contests(
             11223,
@@ -107,7 +101,7 @@ contract gamePredictor is AutomationCompatibleInterface {
         );
 
         ContestsId.push(
-            Game(12124, "india", "england", true, matchStatus.Yet_to_Start)
+            Game(12124, "india", "england", matchStatus.Yet_to_Start)
         );
 
         emit Ongoing_Contests(
@@ -118,7 +112,7 @@ contract gamePredictor is AutomationCompatibleInterface {
         );
 
         ContestsId.push(
-            Game(12546, "england", "australia", true, matchStatus.Yet_to_Start)
+            Game(12546, "england", "australia", matchStatus.Yet_to_Start)
         );
 
         emit Ongoing_Contests(
@@ -149,7 +143,7 @@ contract gamePredictor is AutomationCompatibleInterface {
     function createContest() private {
         uint256 randNum = randomNum(100000);
         ContestsId.push(
-            Game(randNum, "TeamA", "TeamB", true, matchStatus.Yet_to_Start)
+            Game(randNum, "TeamA", "TeamB", matchStatus.Yet_to_Start)
         );
 
         emit Ongoing_Contests(
@@ -246,15 +240,6 @@ contract gamePredictor is AutomationCompatibleInterface {
             playerStake.teamB += msg.value;
         }
     }
-
-    // function MatchProgress(string memory _contestName) public onlyOwner {
-    //     require(isValidContest(_contestName), "Invalid contest name.");
-    //     MatchDetails storage contest = ContestEntry[msg.sender][_contestName];
-
-    //     // contest.result = matchResult;
-
-    //     emit matchProgress(_contestName, _winningTeam, address(this).balance);
-    // }
 
     function declareResult(uint256 _contestId) private {
         uint256 randNum = randomNum(3);
