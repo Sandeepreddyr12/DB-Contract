@@ -11,7 +11,6 @@ import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol";
 
 /* Errors */
 error Predictor__notEnoughFeeEntered(uint256 entryFee);
-error Predictor__notAnOwner();
 error Raffle__UpkeepNotNeeded();
 error Predictor__inValidContest();
 error Predictor__notEnoughBalance();
@@ -54,7 +53,6 @@ contract gamePredictor is AutomationCompatibleInterface {
     Game[] private ContestsId;
     mapping(address => uint256) private Winnings;
     uint256 private immutable i_entryFee;
-    address private owner;
 
     // chainlink automation varaiables
 
@@ -124,13 +122,6 @@ contract gamePredictor is AutomationCompatibleInterface {
 
         interval = updateInterval;
         lastTimeStamp = block.timestamp;
-    }
-
-    modifier onlyOwner() {
-        if (msg.sender != owner) {
-            revert Predictor__notAnOwner();
-        }
-        _;
     }
 
     function randomNum(uint256 range) internal view returns (uint256) {
@@ -269,7 +260,7 @@ contract gamePredictor is AutomationCompatibleInterface {
         }
     }
 
-    function fetchBalance() public onlyOwner {
+    function fetchBalance() public returns (uint256) {
         uint256 totalWinnings;
         for (uint i = 0; i < ContestsId.length; i++) {
             if (ContestsId[i].status == matchStatus.Finished) {
@@ -304,6 +295,7 @@ contract gamePredictor is AutomationCompatibleInterface {
             }
         }
         Winnings[msg.sender] += totalWinnings;
+        return Winnings[msg.sender];
     }
 
     function withDrawBalance() public {
@@ -315,7 +307,7 @@ contract gamePredictor is AutomationCompatibleInterface {
         Winnings[msg.sender] = 0;
 
         payable(msg.sender).transfer(Winnings[msg.sender]);
-        // with transfer if transaction fails, it is automatically reverted.
+        // with transfer, if transaction fails, it is automatically reverted.
         //incase of send or call(returns bool), we have to call require expictly.
     }
 
