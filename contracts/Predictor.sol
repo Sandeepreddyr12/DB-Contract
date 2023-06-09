@@ -15,7 +15,7 @@ error Raffle__UpkeepNotNeeded();
 error Predictor__inValidContest();
 error Predictor__notEnoughBalance();
 
-contract gamePredictor is AutomationCompatibleInterface {
+contract sportsPredictor is AutomationCompatibleInterface {
     /* Type declarations */
     enum result {
         won_by_teamA,
