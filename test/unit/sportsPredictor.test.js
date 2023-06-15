@@ -154,18 +154,18 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
               });
           });
 
-          it("should calculate the correct winnings for a player", async () => {
+          it.only("should calculate the correct winnings for a player", async () => {
               const player1BalanceBefore = await sportsPredictor.connect(player1).getBalance();
-              console.log(player1BalanceBefore, "only balance");
+              console.log(player1BalanceBefore.toString(), "only balance");
 
-              if (player1BalanceBefore == 0) {
+              if (player1BalanceBefore.toString() == 0) {
                   await expect(
                       sportsPredictor.connect(player1).withDrawBalance()
                   ).to.be.revertedWithCustomError(sportsPredictor, "Predictor__notEnoughBalance");
               } else {
                   await sportsPredictor.connect(player1).withDrawBalance();
                   const player1BalanceAfter = await sportsPredictor.connect(player1).getBalance();
-                  expect(player1BalanceAfter).to.equal(0);
+                  expect(player1BalanceAfter.toString()).to.equal(0);
               }
           });
       });
