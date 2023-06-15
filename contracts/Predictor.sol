@@ -24,7 +24,6 @@ error Predictor__notEnoughBalance();
  */
 
 contract sportsPredictor is AutomationCompatibleInterface {
-
     /* Type declarations */
     enum result {
         won_by_teamA,
@@ -176,7 +175,6 @@ contract sportsPredictor is AutomationCompatibleInterface {
         upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
         // We don't use the checkData in this example. The checkData is defined when the Upkeep was registered.
     }
-    
 
     /**
      * @dev Once `checkUpkeep` is returning `true`, this function is called
@@ -362,21 +360,27 @@ contract sportsPredictor is AutomationCompatibleInterface {
         return i_entryFee;
     }
 
+    function getUpdateInterval() public view returns (uint256) {
+        return interval;
+    }
+
     function getBalance() public view returns (uint256) {
         return Winnings[msg.sender];
     }
 
-/**
-     * @notice getContestStake function gives the placed bet/stake of player. 
+    /**
+     * @notice getContestStake function gives the placed bet/stake of player.
      */
 
     function getContestStake(
         uint256 _contestId,
         address _player
     ) public view returns (uint256, uint256, uint256, uint256) {
-        if (!isValidContest(_contestId)) {
-            revert Predictor__inValidContest();
-        }
+       
+       // not needed
+        // if (!isValidContest(_contestId)) {
+        //     revert Predictor__inValidContest();
+        // }
         ContestDetails storage contest = contestEntrances[_contestId];
         PlayerStake storage playerStake = contest.playerStakes[_player];
         return (
