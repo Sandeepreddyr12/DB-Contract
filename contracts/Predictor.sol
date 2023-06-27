@@ -2,12 +2,13 @@
 pragma solidity ^0.8.7;
 
 // todos--
-// enter the match(by paying min amount),
+// enter the match(by paying min entrance Fee),
 // get the current matches from chianlink functions,
 //automate the excutions using chainlink keepers,
-// provide a option to withdraw the amount to their accounts.
+// provide a option to withdraw the winnings to their respective accounts.
 
 //imports
+// import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol";
 
 /* Errors */
@@ -79,47 +80,21 @@ contract sportsPredictor is AutomationCompatibleInterface {
         result contestResult
     );
 
+    event Enter_Contest(
+        address player,
+        uint256 matchId,
+        string team,
+        uint256 value
+    );
+
     /* Functions */
     constructor(uint256 entranceFee, uint256 updateInterval) {
         i_entryFee = entranceFee;
 
-        // had faced issues while fetchings api from chainlink functions which is in closed beta.
-        // untill, hardcoded the contests and events.
-        ContestsId.push(
-            Game(11223, "india", "australia", matchStatus.Yet_to_Start)
-        );
-        emit Ongoing_Contests(
-            11223,
-            "india",
-            "australia",
-            matchStatus.Yet_to_Start
-        );
-
-        ContestsId.push(
-            Game(12124, "india", "england", matchStatus.Yet_to_Start)
-        );
-
-        // Emit an event when contest is created
-        emit Ongoing_Contests(
-            12124,
-            "india",
-            "england",
-            matchStatus.Yet_to_Start
-        );
-
-        ContestsId.push(
-            Game(12546, "england", "australia", matchStatus.Yet_to_Start)
-        );
-
-        emit Ongoing_Contests(
-            12546,
-            "england",
-            "australia",
-            matchStatus.Yet_to_Start
-        );
-
         interval = updateInterval;
         lastTimeStamp = block.timestamp;
+
+        createContest();
     }
 
     /**
@@ -129,7 +104,7 @@ contract sportsPredictor is AutomationCompatibleInterface {
      * untill, random num generator replaces it.
      */
 
-    function randomNum(uint256 range) internal view returns (uint256) {
+    function randomNum(uint256 range) private view returns (uint256) {
         return
             uint256(
                 keccak256(abi.encodePacked(block.difficulty, block.timestamp))
@@ -143,15 +118,43 @@ contract sportsPredictor is AutomationCompatibleInterface {
      */
 
     function createContest() private {
-        uint256 randNum = randomNum(100000);
+        uint256 randNum1 = randomNum(1000000);
+        uint256 randNum2 = randomNum(1000000);
+        uint256 randNum3 = randomNum(1000000);
+
+        // had faced issues while fetchings api from chainlink functions which is in closed beta.
+        // untill, hardcoded the contests and events.
+
         ContestsId.push(
-            Game(randNum, "TeamA", "TeamB", matchStatus.Yet_to_Start)
+            Game(randNum1, "India", "Australia", matchStatus.Yet_to_Start)
+        );
+        emit Ongoing_Contests(
+            randNum1,
+            "India",
+            "Australia",
+            matchStatus.Yet_to_Start
+        );
+
+        ContestsId.push(
+            Game(randNum2, "Newzealand", "England", matchStatus.Yet_to_Start)
+        );
+
+        // Emit an event when contest is created
+        emit Ongoing_Contests(
+            randNum2,
+            "Newzealand",
+            "England",
+            matchStatus.Yet_to_Start
+        );
+
+        ContestsId.push(
+            Game(randNum3, "SouthAfrica", "Srilanka", matchStatus.Yet_to_Start)
         );
 
         emit Ongoing_Contests(
-            randNum,
-            "TeamA",
-            "TeamB",
+            randNum3,
+            "SouthAfrica",
+            "Srilanka",
             matchStatus.Yet_to_Start
         );
     }
@@ -258,6 +261,7 @@ contract sportsPredictor is AutomationCompatibleInterface {
             contest.totalAmount_B += msg.value;
             playerStake.teamB += msg.value;
         }
+        emit Enter_Contest(msg.sender, _contestId, _team, msg.value);
     }
 
     /**
@@ -341,7 +345,7 @@ contract sportsPredictor is AutomationCompatibleInterface {
         return Winnings[msg.sender];
     }
 
-    function withDrawBalance() public {
+    function withDrawWinnigs() public {
         uint256 balance = Winnings[msg.sender];
         if (balance <= 0) {
             revert Predictor__notEnoughBalance();
@@ -353,6 +357,19 @@ contract sportsPredictor is AutomationCompatibleInterface {
         // with transfer, if transaction fails, it is automatically reverted.
         //incase of send or call(returns bool), we have to call require expictly.
     }
+
+    //  function to withdraw contract balance
+
+    //     function withdraw() public onlyOwner {
+    //         uint256 amount = address(this).balance;
+    //         if (amount <= 0) {
+    //             revert Predictor__notEnoughBalance();
+    //         }
+
+    //         payable(msg.sender).transfer(amount);
+    //         // with transfer, if transaction fails, it is automatically reverted.
+    //         //incase of send or call(returns bool), we have to call require expictly.
+    //     }
 
     //getters
 
@@ -376,8 +393,7 @@ contract sportsPredictor is AutomationCompatibleInterface {
         uint256 _contestId,
         address _player
     ) public view returns (uint256, uint256, uint256, uint256) {
-       
-       // not needed
+        // not needed
         // if (!isValidContest(_contestId)) {
         //     revert Predictor__inValidContest();
         // }
