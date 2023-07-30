@@ -9,7 +9,7 @@ pragma solidity ^0.8.7;
 
 //imports
 // import "@openzeppelin/contracts/access/Ownable.sol";
-import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol";
+// import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol";
 
 /* Errors */
 error Predictor__notEnoughFeeEntered(uint256 entryFee);
@@ -24,7 +24,7 @@ error Predictor__notEnoughBalance();
  * and Chainlink functions for fetching the live matches & its results.
  */
 
-contract sportsPredictor is AutomationCompatibleInterface {
+contract sportsPredictor {
     /* Type declarations */
     enum result {
         won_by_teamA,
@@ -64,21 +64,17 @@ contract sportsPredictor is AutomationCompatibleInterface {
     uint256 private immutable i_entryFee;
 
     // chainlink automation varaiables
-    uint256 private immutable interval;
-    uint256 private lastTimeStamp;
+    // uint256 private immutable interval;
+    // uint256 private lastTimeStamp;
 
     /* Events */
     event Ongoing_Contests(
         uint256 matchId,
         string teamA,
         string teamB,
-        matchStatus status
+        string status
     );
-    event Contest_Status(
-        uint256 matchId,
-        matchStatus status,
-        result contestResult
-    );
+    event Contest_Status(uint256 matchId, string status, string contestResult);
 
     event Enter_Contest(
         address player,
@@ -88,11 +84,11 @@ contract sportsPredictor is AutomationCompatibleInterface {
     );
 
     /* Functions */
-    constructor(uint256 entranceFee, uint256 updateInterval) {
+    constructor(uint256 entranceFee) {
         i_entryFee = entranceFee;
 
-        interval = updateInterval;
-        lastTimeStamp = block.timestamp;
+        // interval = updateInterval;
+        // lastTimeStamp = block.timestamp;
 
         createContest();
     }
@@ -118,99 +114,122 @@ contract sportsPredictor is AutomationCompatibleInterface {
      */
 
     function createContest() private {
-        uint256 randNum1 = randomNum(1000000);
-        uint256 randNum2 = randomNum(1000000);
-        uint256 randNum3 = randomNum(1000000);
+        uint256 randNum = randomNum(1000000);
 
         // had faced issues while fetchings api from chainlink functions which is in closed beta.
         // untill, hardcoded the contests and events.
 
         ContestsId.push(
-            Game(randNum1, "India", "Australia", matchStatus.Yet_to_Start)
+            Game(randNum, "India", "Australia", matchStatus.Yet_to_Start)
         );
-        emit Ongoing_Contests(
-            randNum1,
-            "India",
-            "Australia",
-            matchStatus.Yet_to_Start
-        );
+        emit Ongoing_Contests(randNum, "India", "Australia", "Yet_to_Start");
 
         ContestsId.push(
-            Game(randNum2, "Newzealand", "England", matchStatus.Yet_to_Start)
+            Game(randNum + 1, "Newzealand", "England", matchStatus.Yet_to_Start)
         );
 
         // Emit an event when contest is created
         emit Ongoing_Contests(
-            randNum2,
+            randNum + 1,
             "Newzealand",
             "England",
-            matchStatus.Yet_to_Start
+            "Yet_to_Start"
         );
 
         ContestsId.push(
-            Game(randNum3, "SouthAfrica", "Srilanka", matchStatus.Yet_to_Start)
+            Game(
+                randNum + 2,
+                "SouthAfrica",
+                "Srilanka",
+                matchStatus.Yet_to_Start
+            )
         );
 
         emit Ongoing_Contests(
-            randNum3,
+            randNum + 2,
             "SouthAfrica",
             "Srilanka",
-            matchStatus.Yet_to_Start
+            "Yet_to_Start"
         );
     }
 
-    /**
-     * @dev This is the function that the Chainlink Keeper nodes call
-     * they look for `upkeepNeeded` to return True.
-     * the following should be true for this to return true:
-     * 1. The contract has ETH.
-     * 2. Implicity, your subscription is funded with LINK.
-     */
+    // /**
+    //  * @dev This is the function that the Chainlink Keeper nodes call
+    //  * they look for `upkeepNeeded` to return True.
+    //  * the following should be true for this to return true:
+    //  * 1. The contract has ETH.
+    //  * 2. Implicity, your subscription is funded with LINK.
+    //  */
 
-    function checkUpkeep(
-        bytes memory /* checkData */
-    )
-        public
-        view
-        override
-        returns (bool upkeepNeeded, bytes memory /* performData */)
-    {
-        upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
-        // We don't use the checkData in this example. The checkData is defined when the Upkeep was registered.
-    }
+    // function checkUpkeep(
+    //     bytes memory /* checkData */
+    // )
+    //     public
+    //     view
+    //     override
+    //     returns (bool upkeepNeeded, bytes memory /* performData */)
+    // {
+    //     upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
+    //     // We don't use the checkData in this example. The checkData is defined when the Upkeep was registered.
+    //     return (upkeepNeeded, "0x0");
+    // }
 
     /**
      * @dev Once `checkUpkeep` is returning `true`, this function is called
      * and it kicks off a Chainlink VRF call to get a random winner.
      */
 
-    function performUpkeep(bytes calldata /* performData */) external override {
-        //We highly recommend revalidating the upkeep in the performUpkeep function
-        (bool upkeepNeeded, ) = checkUpkeep("");
-        if (!upkeepNeeded) {
-            revert Raffle__UpkeepNotNeeded();
-        }
+    // function performUpkeep(bytes calldata /* performData */) external override {
+    //     //We highly recommend revalidating the upkeep in the performUpkeep function
+    //     (bool upkeepNeeded, ) = checkUpkeep("");
+    //     if (!upkeepNeeded) {
+    //         revert Raffle__UpkeepNotNeeded();
+    //     }
 
+    //     // this loop currently hardcoded to chage the results for given time interval
+    //     // gonna replace it with chainlink functions
+
+    //     for (uint i = 0; i < ContestsId.length; i++) {
+    //         if (ContestsId[i].status == matchStatus.in_Progress) {
+    //             ContestsId[i].status = matchStatus.Finished;
+    //             declareResult(i);
+    //         } else if (ContestsId[i].status == matchStatus.Yet_to_Start) {
+    //             ContestsId[i].status = matchStatus.in_Progress;
+    //             emit Contest_Status(
+    //                 i,
+    //                 matchStatus.in_Progress,
+    //                 result.Draw_or_noResult
+    //             );
+    //         }
+    //     }
+
+    //     createContest();
+
+    //     lastTimeStamp = block.timestamp;
+    //     // We don't use the performData in this example. The performData is generated by the Automation Node's call to your checkUpkeep function
+    // }
+
+    function performUpkeep() public {
         // this loop currently hardcoded to chage the results for given time interval
         // gonna replace it with chainlink functions
 
         for (uint i = 0; i < ContestsId.length; i++) {
             if (ContestsId[i].status == matchStatus.in_Progress) {
                 ContestsId[i].status = matchStatus.Finished;
-                declareResult(i);
+                declareResult(ContestsId[i].matchId);
             } else if (ContestsId[i].status == matchStatus.Yet_to_Start) {
                 ContestsId[i].status = matchStatus.in_Progress;
                 emit Contest_Status(
-                    i,
-                    matchStatus.in_Progress,
-                    result.Draw_or_noResult
+                    ContestsId[i].matchId,
+                    "in_Progress",
+                    "on_going"
                 );
             }
         }
 
         createContest();
 
-        lastTimeStamp = block.timestamp;
+        // lastTimeStamp = block.timestamp;
         // We don't use the performData in this example. The performData is generated by the Automation Node's call to your checkUpkeep function
     }
 
@@ -277,25 +296,13 @@ contract sportsPredictor is AutomationCompatibleInterface {
 
         if (randNum == 0) {
             contest.contestResult = result.won_by_teamA;
-            emit Contest_Status(
-                _contestId,
-                matchStatus.Finished,
-                result.won_by_teamA
-            );
+            emit Contest_Status(_contestId, "Finished", "won_by_teamA");
         } else if (randNum == 1) {
             contest.contestResult = result.won_by_teamB;
-            emit Contest_Status(
-                _contestId,
-                matchStatus.Finished,
-                result.won_by_teamB
-            );
+            emit Contest_Status(_contestId, "Finished", "won_by_teamB");
         } else {
             contest.contestResult = result.Draw_or_noResult;
-            emit Contest_Status(
-                _contestId,
-                matchStatus.Finished,
-                result.Draw_or_noResult
-            );
+            emit Contest_Status(_contestId, "Finished", "Draw_or_noResult");
         }
     }
 
@@ -311,7 +318,9 @@ contract sportsPredictor is AutomationCompatibleInterface {
         uint256 totalWinnings;
         for (uint i = 0; i < ContestsId.length; i++) {
             if (ContestsId[i].status == matchStatus.Finished) {
-                ContestDetails storage contest = contestEntrances[i];
+                ContestDetails storage contest = contestEntrances[
+                    ContestsId[i].matchId
+                ];
                 PlayerStake storage playerStake = contest.playerStakes[
                     msg.sender
                 ];
@@ -377,9 +386,9 @@ contract sportsPredictor is AutomationCompatibleInterface {
         return i_entryFee;
     }
 
-    function getUpdateInterval() public view returns (uint256) {
-        return interval;
-    }
+    // function getUpdateInterval() public view returns (uint256) {
+    //     return interval;
+    // }
 
     function getBalance() public view returns (uint256) {
         return Winnings[msg.sender];
@@ -389,7 +398,7 @@ contract sportsPredictor is AutomationCompatibleInterface {
      * @notice getContestStake function gives the placed bet/stake of player.
      */
 
-    function getContestStake(
+    function getPlayerStake(
         uint256 _contestId,
         address _player
     ) public view returns (uint256, uint256, uint256, uint256) {
@@ -407,19 +416,21 @@ contract sportsPredictor is AutomationCompatibleInterface {
         );
     }
 
+    function getTeamStake(
+        uint256 _contestId
+    ) public view returns (uint256, uint256) {
+        // not needed
+        // if (!isValidContest(_contestId)) {
+        //     revert Predictor__inValidContest();
+        // }
+        ContestDetails storage contest = contestEntrances[_contestId];
+        return (contest.totalAmount_A, contest.totalAmount_B);
+    }
+
     // function getTotalAmount(
     //    uint256 _contestId,
     // ) public view returns (uint256, uint256) {
     //     ContestDetails storage contest = contestEntrances[_contestId];
     //     return (contest.totalAmount_A, contest.totalAmount_B);
-    // }
-
-    // function getPlayerStake(
-    //     uint256 _contestId,
-    //     address _player
-    // ) public view returns (uint256, uint256) {
-    //     ContestDetails storage contest = contestEntrances[_contestId];
-    //     PlayerStake storage playerStake = contest.playerStakes[_player];
-    //     return (playerStake.teamA, playerStake.teamB);
     // }
 }
