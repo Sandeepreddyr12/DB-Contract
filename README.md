@@ -30,7 +30,7 @@ Compile the contract:npx hardhat compile
 Deploy the contract:npx hardhat run scripts/deploy.js --network your_network // (i'm using sepolia)
 
 
-###Usage
+### Usage
 Interact with the contract by connecting to it through a web interface or a dApp.
 
 Fetch match data from decentralized oracle functions to ensure that the match details are accurate and unbiased.
@@ -41,7 +41,7 @@ Monitor events emitted by the contract to keep track of betting activity and mat
 
 After the match result is determined, the contract will allow users to withdraw their winnings.
 
-##Contract Structure
+## Contract Structure
 The contract is structured as follows:
 
 contracts/BettingContract.sol: Contains the main betting contract code.
@@ -50,12 +50,12 @@ interfaces/OracleInterface.sol: Interface for interacting with decentralized ora
 
 scripts/deploy.js: Deployment script.
 
-###Testing
+### Testing
 Ensure contract functionality is working as expected by running tests: npx hardhat test
 npx hardhat test
 
 
-###Contributing
+### Contributing
 We welcome contributions to improve this contract. To contribute: 
 
 Fork the repository.
