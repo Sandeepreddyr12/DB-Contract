@@ -39,6 +39,7 @@
     "typechain": "^8.1.0"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^4.9.2",
     "dotenv": "^16.0.3"
   },
   "lint-staged": {
