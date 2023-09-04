@@ -7,7 +7,10 @@ Welcome to the Decentralized Betting Contract repository! This contract is writt
 
 - **Unlimited Betting**: Users can place bets on either of the teams in a match without limitations.
 
-- **Decentralized Oracle Functions**: Fetch match data from decentralized oracle functions to ensure data accuracy.( "oracle functions are in beta, haven't had results i wanted, so i given manual code simulates the matchcreation and results") 
+- **Decentralized Oracle Functions**: Fetch match data from decentralized oracle functions to ensure data accuracy.( "oracle functions are in beta, haven't had results i wanted, so i given manual code simulates the matchcreation and results"). 
+
+      *Note* Oracle Functions which fetches data from offchain are currently in beta, not working properly as i intended, So i Repalced with function which adds preprogrammed match data on certain interval using chailink keepers/Automation.   
+
 
 - **Event Logging**: Comprehensive use of events to log all significant contract activities for transparency.
 
